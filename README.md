@@ -1,2 +1,3 @@
 # sneaky
-_daily updates of our java project Sneaky_ 
+
+Sneaky is a Snake game with the concept of Pacman.

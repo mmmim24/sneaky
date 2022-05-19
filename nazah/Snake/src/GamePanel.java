@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.security.Key;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener{
@@ -17,6 +18,8 @@ public class GamePanel extends JPanel implements ActionListener{
     static final int DELAY = 75; /// delay for our timer. this timer will call the action listener after a delay
     final int x[] = new int[GAME_UNITS]; // body part of the snake, the snake cannot be bigger than the game itself
     final int y[] = new int[GAME_UNITS];
+    public ArrayList<Point> mazeParts = new ArrayList<Point>();
+    public int[] mazeCoord = new int[2];;
     int bodyParts = 6;
     int applesEaten;
     int appleX; /// random location of apple
@@ -44,15 +47,36 @@ public class GamePanel extends JPanel implements ActionListener{
     public void startGame()
     {
         // when we start this game, the first thing we need to do is, randomly locate the apple
+        mazeParts.clear();
         newApple();
         running = true; // game is running now
         timer = new Timer(DELAY,this); /// action listener interfsce
+        for (int i = 0; i < 10; i++) {
+            mazeCoord = generateMazePart();
+            mazeParts.add(new Point(mazeCoord[0], mazeCoord[1]));        }
         timer.start();
     }
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g); /// eitay ki korbe bujhinai :v
+
+//        for(int i=0;i<SCREEN_HEIGHT/UNIT_SIZE;i++)
+//        {
+//
+//            g.drawLine(i*UNIT_SIZE,0,i*UNIT_SIZE,SCREEN_HEIGHT);
+//            g.drawLine(0,i*UNIT_SIZE,SCREEN_WIDTH,i*UNIT_SIZE);
+//        }
         draw(g);
+    }
+    public int[] generateMazePart () {
+        int[] coord = new int[2];
+        do {
+            coord[0] = random.nextInt(SCREEN_WIDTH/UNIT_SIZE);
+            coord[1] = random.nextInt(SCREEN_WIDTH/UNIT_SIZE);
+        }
+        while (coord[1] < 3);
+
+        return coord;
     }
     public void draw(Graphics g)
     {
@@ -61,12 +85,10 @@ public class GamePanel extends JPanel implements ActionListener{
         if(running)
         /// apple
         {
-            for(int i=0;i<SCREEN_HEIGHT/UNIT_SIZE;i++)
-            {
+            /// maze
+            g.setColor(Color.GRAY);
+            for (Point point : mazeParts) g.fillRect(point.x * UNIT_SIZE, point.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
 
-                g.drawLine(i*UNIT_SIZE,0,i*UNIT_SIZE,SCREEN_HEIGHT);
-                g.drawLine(0,i*UNIT_SIZE,SCREEN_WIDTH,i*UNIT_SIZE);
-            }
             g.setColor(Color.red);
             g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
 

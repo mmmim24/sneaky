@@ -19,7 +19,7 @@ public class GamePanel extends JPanel implements ActionListener{
     final int x[] = new int[GAME_UNITS]; // body part of the snake, the snake cannot be bigger than the game itself
     final int y[] = new int[GAME_UNITS];
     public ArrayList<Point> mazeParts = new ArrayList<Point>();
-    public int[] mazeCoord = new int[2];;
+    public int[] mazeCoord = new int[2];
     int bodyParts = 6;
     int applesEaten;
     int appleX; /// random location of apple
@@ -73,6 +73,7 @@ public class GamePanel extends JPanel implements ActionListener{
         do {
             coord[0] = random.nextInt(SCREEN_WIDTH/UNIT_SIZE);
             coord[1] = random.nextInt(SCREEN_WIDTH/UNIT_SIZE);
+
         }
         while (coord[1] < 3);
 
@@ -125,23 +126,11 @@ public class GamePanel extends JPanel implements ActionListener{
             x[i] = x[i-1]; /// . . . <- this one will move
             y[i] = y[i-1];
         }
-        switch(direction)
-        {
-            case 'U':
-                y[0] = y[0] - UNIT_SIZE;
-                break;
-
-            case 'D':
-                y[0] = y[0] + UNIT_SIZE;
-                break;
-
-            case 'R':
-                x[0] = x[0] + UNIT_SIZE;
-                break;
-
-            case 'L':
-                x[0] = x[0] - UNIT_SIZE;
-                break;
+        switch (direction) {
+            case 'U' -> y[0] = y[0] - UNIT_SIZE;
+            case 'D' -> y[0] = y[0] + UNIT_SIZE;
+            case 'R' -> x[0] = x[0] + UNIT_SIZE;
+            case 'L' -> x[0] = x[0] - UNIT_SIZE;
         }
     }
     public void checkApple() // if apple khaise
@@ -161,6 +150,7 @@ public class GamePanel extends JPanel implements ActionListener{
             if((x[0]==x[i]) && (y[0]==y[i]))
             {
                 running = false;
+                break;
             }
         }
         /// head of snake collides with maze
@@ -168,6 +158,7 @@ public class GamePanel extends JPanel implements ActionListener{
         {
             if (point.x*UNIT_SIZE == x[0] && point.y*UNIT_SIZE == y[0]) {
                 running = false;
+                break;
             }
         }
 

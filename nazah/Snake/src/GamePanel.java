@@ -163,6 +163,15 @@ public class GamePanel extends JPanel implements ActionListener{
                 running = false;
             }
         }
+        /// head of snake collides with maze
+        for (Point point: mazeParts)
+        {
+            if (point.x*UNIT_SIZE == x[0] && point.y*UNIT_SIZE == y[0]) {
+                running = false;
+            }
+        }
+
+
         /// check if head touches the borders;
 
         if(x[0]<0)  // left border
@@ -182,7 +191,9 @@ public class GamePanel extends JPanel implements ActionListener{
             running = false;
         }
 
+
     }
+
     public void gameOver(Graphics g) /// new popup
     {
         /// game over - text

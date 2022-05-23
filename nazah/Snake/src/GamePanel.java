@@ -15,9 +15,12 @@ public class GamePanel extends JPanel implements ActionListener{
     static final int UNIT_SIZE = 25; /// how big we want the objects in our game. basically 25 pixels in this screen
     static final int GAME_UNITS = (SCREEN_WIDTH*SCREEN_HEIGHT)/UNIT_SIZE; /// number of objects in the screen
 
-    static final int DELAY = 75; /// delay for our timer. this timer will call the action listener after a delay
+    static final int DELAY = 100; /// delay for our timer. this timer will call the action listener after a delay
     final int x[] = new int[GAME_UNITS]; // body part of the snake, the snake cannot be bigger than the game itself
     final int y[] = new int[GAME_UNITS];
+
+
+
     public ArrayList<Point> mazeParts = new ArrayList<Point>();
     public int[] mazeCoord = new int[2];
     int bodyParts = 6;
@@ -28,6 +31,7 @@ public class GamePanel extends JPanel implements ActionListener{
     char direction = 'R'; /// at the beginning it'll go right
 
     boolean running = false;
+    public boolean paused = false;
 
     Timer timer;
     Random random;
@@ -48,6 +52,7 @@ public class GamePanel extends JPanel implements ActionListener{
     {
         // when we start this game, the first thing we need to do is, randomly locate the apple
         mazeParts.clear();
+        paused = false;
         newApple();
         running = true; // game is running now
         timer = new Timer(DELAY,this); /// action listener interfsce
@@ -81,30 +86,51 @@ public class GamePanel extends JPanel implements ActionListener{
     }
     public void draw(Graphics g)
     {
-        /// grid
 
+        /// grid
+        for(int i=0;i<SCREEN_WIDTH/UNIT_SIZE;i++)
+        {
+            for(int j=0;j<SCREEN_HEIGHT/UNIT_SIZE;j++)
+            {
+                if((i+j)%2==0)
+                {
+                    g.setColor(new Color(0x7fa278));
+                }
+                else {
+                    g.setColor(new Color(0x93bb8b));
+                }
+                g.fillRect(i*UNIT_SIZE,j*UNIT_SIZE,UNIT_SIZE,UNIT_SIZE);
+
+            }
+        }
         if(running)
         /// apple
         {
             /// maze
-            g.setColor(Color.GRAY);
+            g.setColor(new Color(0x5B3F3A));
+            int r = random.nextInt(6);
             for (Point point : mazeParts) g.fillRect(point.x * UNIT_SIZE, point.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
 
-            g.setColor(Color.red);
+            g.setColor(new Color(217,8,18,255));
             g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
+
 
 
             // body of snake
 
             for (int i = 0; i < bodyParts; i++) {
                 if (i == 0) {
-                    g.setColor(new Color(0x47051));
-                    g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+                    g.setColor(new Color(0x1F332E));
+                    g.fillOval(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
                 } else {
-                    g.setColor(new Color(0xeab6c));
-                    g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+                    g.setColor(new Color(0x415840));
+                    g.fillOval(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
                 }
             }
+            g.setColor(new Color(0xC51D2A));
+            g.setFont( new Font("Courier New",Font.BOLD, 30));
+            FontMetrics metrics = getFontMetrics(g.getFont());
+            g.drawString("Score: "+applesEaten, (SCREEN_WIDTH - metrics.stringWidth("Score: "+applesEaten))/2, g.getFont().getSize());
         }
         else
         {
@@ -114,6 +140,7 @@ public class GamePanel extends JPanel implements ActionListener{
     }
     public void newApple() /// everytime apple khabe notun location generate korbe
     {
+
         appleX = random.nextInt((int)SCREEN_WIDTH/UNIT_SIZE)*UNIT_SIZE; /// placed evenly within the boxes
         appleY = random.nextInt((int)SCREEN_HEIGHT/UNIT_SIZE)*UNIT_SIZE;
     }
@@ -121,17 +148,21 @@ public class GamePanel extends JPanel implements ActionListener{
     {
         /// moving the snake
         // iterating through the body parts of the snake
-        for(int i = bodyParts;i>0;i--)
+        if(!paused)
         {
-            x[i] = x[i-1]; /// . . . <- this one will move
-            y[i] = y[i-1];
+            for(int i = bodyParts;i>0;i--)
+            {
+                x[i] = x[i-1]; /// . . . <- this one will move
+                y[i] = y[i-1];
+            }
+            switch (direction) {
+                case 'U' -> y[0] = y[0] - UNIT_SIZE;
+                case 'D' -> y[0] = y[0] + UNIT_SIZE;
+                case 'R' -> x[0] = x[0] + UNIT_SIZE;
+                case 'L' -> x[0] = x[0] - UNIT_SIZE;
+            }
         }
-        switch (direction) {
-            case 'U' -> y[0] = y[0] - UNIT_SIZE;
-            case 'D' -> y[0] = y[0] + UNIT_SIZE;
-            case 'R' -> x[0] = x[0] + UNIT_SIZE;
-            case 'L' -> x[0] = x[0] - UNIT_SIZE;
-        }
+
     }
     public void checkApple() // if apple khaise
     {
@@ -187,9 +218,13 @@ public class GamePanel extends JPanel implements ActionListener{
 
     public void gameOver(Graphics g) /// new popup
     {
+        g.setColor(new Color(0xC51D2A));
+        g.setFont( new Font("Courier New",Font.BOLD, 30));
+        FontMetrics metrics1 = getFontMetrics(g.getFont());
+        g.drawString("Score: "+applesEaten, (SCREEN_WIDTH - metrics1.stringWidth("Score: "+applesEaten))/2, g.getFont().getSize());
         /// game over - text
-        g.setColor(Color.GRAY);
-        g.setFont(new Font("Ariel",Font.ITALIC,75));
+        g.setColor(new Color(0x1d1817));
+        g.setFont(new Font("Courier New",Font.ITALIC,75));
 
         FontMetrics metric = getFontMetrics(g.getFont());
         g.drawString("Game over!",(SCREEN_WIDTH-metric.stringWidth("Game over!"))/2,SCREEN_HEIGHT/2);
@@ -212,6 +247,7 @@ public class GamePanel extends JPanel implements ActionListener{
         @Override
         public void keyPressed(KeyEvent e)
         {
+
             switch (e.getKeyCode())
             {
                 case KeyEvent.VK_LEFT:
@@ -240,6 +276,11 @@ public class GamePanel extends JPanel implements ActionListener{
                         direction = 'D';
                     }
                     break;
+                case KeyEvent.VK_SPACE:
+
+                        paused = !paused; //toggles paused boolean
+                        break;
+
             }
         }
 

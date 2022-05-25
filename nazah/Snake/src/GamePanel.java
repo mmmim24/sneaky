@@ -4,12 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class GamePanel extends JPanel implements ActionListener{
-
+public class GamePanel extends JPanel implements ActionListener {
     static final int SCREEN_WIDTH = 900;
     static final int SCREEN_HEIGHT = 600;
     static final int UNIT_SIZE = 25; /// how big we want the objects in our game. basically 25 pixels in this screen
@@ -18,14 +16,7 @@ public class GamePanel extends JPanel implements ActionListener{
     static final int DELAY = 150; /// delay for our timer. this timer will call the action listener after a delay
     final int x[] = new int[GAME_UNITS]; // body part of the snake, the snake cannot be bigger than the game itself
     final int y[] = new int[GAME_UNITS];
-
-
-
-//    public ArrayList<Point> mazeParts = new ArrayList<Point>();
-//    public int[] mazeCoord = new int[2];
-
     ArrayList<Maze> walls = new ArrayList<>();
-
 
     int bodyParts = 6;
     int applesEaten;
@@ -40,17 +31,6 @@ public class GamePanel extends JPanel implements ActionListener{
     Timer timer;
     Random random;
 
-    /// BUG FIX REQUIRED:
-    /*
-    1. CHECK noMaze() - while generating random location of apple
-     */
-
-
-    /// FEATURES TO BE ADDED:
-    /*
-    - complex maze
-    - random alphabet and check collison
-     */
     GamePanel()
     {
         random = new Random();
@@ -59,7 +39,6 @@ public class GamePanel extends JPanel implements ActionListener{
         this.setFocusable(true);
         this.addKeyListener(new MyKeyAdapter());
         startGame();
-
     }
     public void startGame()
     {
@@ -68,22 +47,15 @@ public class GamePanel extends JPanel implements ActionListener{
         paused = false;
         newApple();
         running = true; // game is running now
-        generateMaze();
-        timer = new Timer(DELAY,this); /// action listener interfsce
-
-//        for (int i = 0; i < 10; i++) {
-//            mazeCoord = generateMazePart();
-//            mazeParts.add(new Point(mazeCoord[0], mazeCoord[1]));        }
+        timer = new Timer(DELAY,this);
         timer.start();
-    }
-    public void generateMaze()
-    {
-
     }
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g); /// eitay ki korbe bujhinai :v
-
+ /*
+ reference for grid.
+  */
 //        for(int i=0;i<SCREEN_HEIGHT/UNIT_SIZE;i++)
 //        {
 //
@@ -93,24 +65,6 @@ public class GamePanel extends JPanel implements ActionListener{
         draw(g);
 
     }
-//    public int[] generateMazePart () {
-//        int[] coord = new int[2];
-//        coord[0] = 0;
-//
-//        for(int i=0;i<2;i++)
-//        {
-//            coord[0] = random.nextInt(SCREEN_WIDTH/UNIT_SIZE);
-//            coord[1] = random.nextInt(SCREEN_WIDTH/UNIT_SIZE);
-//        }
-////        do {
-////            coord[0] = random.nextInt(SCREEN_WIDTH/UNIT_SIZE);
-////            coord[1] = random.nextInt(SCREEN_WIDTH/UNIT_SIZE);
-////
-////        }
-////        while (coord[1] < 3);
-//
-//        return coord;
-//    }
     public void draw(Graphics g)
     {
 
@@ -131,10 +85,10 @@ public class GamePanel extends JPanel implements ActionListener{
             }
         }
         if(running)
-        /// apple
+
         {
 
-            // draw rect
+            // maze
 
 
             walls.add(new Maze(50,25,100,25)); ///a
@@ -173,28 +127,17 @@ public class GamePanel extends JPanel implements ActionListener{
             walls.add(new Maze(475+25*10,100,125,25)); // GG
 
 
-
-
-
-
-
-
-
-
-
-
             for(Maze wall: walls)
             {
                 wall.draw((Graphics2D) g);
             }
 
 
-            /// maze
-            g.setColor(new Color(0x5B3F3A));
-//            for (Point point : mazeParts) g.fillRect(point.x * UNIT_SIZE, point.y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-
-            g.setColor(new Color(217,8,18,255));
+            // apple
+            g.setColor(Color.white);
             g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
+            g.setColor(new Color(217,8,18,255));
+            g.fillOval(appleX+1, appleY+1, UNIT_SIZE-2, UNIT_SIZE-2);
 
 
 
@@ -209,12 +152,7 @@ public class GamePanel extends JPanel implements ActionListener{
                     g.fillOval(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
                 }
             }
-//            g.setColor(new Color(0xC51D2A));
-//            g.setFont( new Font("Courier New",Font.BOLD, 30));
-//            FontMetrics metrics = getFontMetrics(g.getFont());
-//
-//
-//            g.drawString("Score: "+applesEaten, (SCREEN_WIDTH - metrics.stringWidth("Score: "+applesEaten))/2, g.getFont().getSize());
+
         }
         else
         {
@@ -232,19 +170,13 @@ public class GamePanel extends JPanel implements ActionListener{
             appleX = random.nextInt((int) SCREEN_WIDTH / UNIT_SIZE) * UNIT_SIZE; /// placed evenly within the boxes
             appleY = random.nextInt((int) SCREEN_HEIGHT / UNIT_SIZE) * UNIT_SIZE;
             for (Maze wall : walls) {
-                if (wall.hitBox.x == appleX && wall.hitBox.y == appleY) {
+                if (wall.mazeParts.x == appleX && wall.mazeParts.y == appleY) {
                     conflict = true;
                 }
             }
         } while (conflict);
 
-//        for(Maze wall: walls) {
-//            while (wall.hitBox.x != appleX && wall.hitBox.y != appleY) {
-//                appleX = random.nextInt((int) SCREEN_WIDTH / UNIT_SIZE) * UNIT_SIZE; /// placed evenly within the boxes
-//                appleY = random.nextInt((int) SCREEN_HEIGHT / UNIT_SIZE) * UNIT_SIZE;
-//            }
 
-//    }
 
     }
     public void move()
@@ -301,7 +233,7 @@ public class GamePanel extends JPanel implements ActionListener{
 
         for(Maze wall: walls)
         {
-            if(wall.hitBox.intersects(new Rectangle(x[0],y[0],UNIT_SIZE,UNIT_SIZE))){
+            if(wall.mazeParts.intersects(new Rectangle(x[0],y[0],UNIT_SIZE,UNIT_SIZE))){
                 running = false;
             }
         }
@@ -337,8 +269,8 @@ public class GamePanel extends JPanel implements ActionListener{
 //        FontMetrics metrics1 = getFontMetrics(g.getFont());
 //        g.drawString("Score: "+applesEaten, (SCREEN_WIDTH - metrics1.stringWidth("Score: "+applesEaten))/2, g.getFont().getSize());
         /// game over - text
-        g.setColor(new Color(0x1d1817));
-        g.setFont(new Font("Courier New",Font.ITALIC,75));
+        g.setColor(new Color(0x171717));
+        g.setFont(new Font("CHARLESWORTH",Font.BOLD,75));
 
         FontMetrics metric = getFontMetrics(g.getFont());
         g.drawString("Game over!",(SCREEN_WIDTH-metric.stringWidth("Game over!"))/2,SCREEN_HEIGHT/2);
@@ -357,7 +289,7 @@ public class GamePanel extends JPanel implements ActionListener{
     }
     /// key adapter is an abstract class where u wont have to implement all the abstract methods
 
-    public class MyKeyAdapter extends KeyAdapter{
+    public class MyKeyAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e)
         {
@@ -392,11 +324,13 @@ public class GamePanel extends JPanel implements ActionListener{
                     break;
                 case KeyEvent.VK_SPACE:
 
-                        paused = !paused; //toggles paused boolean
-                        break;
+                    paused = !paused; //toggles paused boolean
+                    break;
 
             }
         }
 
     }
+
+
 }
